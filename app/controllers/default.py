@@ -23,18 +23,13 @@ def selecionar_users():
 # selecionar um
 @user_blueprint.route("/usuarios/<id>", methods=['GET'])
 def selecionar_user(id): 
-    user = User.query.filter(id).first()
+    user = User.query.filter_by(id=id).first()
     user_json = user.to_json()
     return Response(200, "usuario", user_json)
 
 # cadastrar 
-@user_blueprint.route("/usuarios/<id>", methods=['POST'])
-def cadastrar(id): 
-    # verificar se user ja existe
-    verificar = User.query.get(id)
-    if verificar is None: 
-        return gera_response(404, "", {}, mensagem='Usuário não encontrado')
-    
+@user_blueprint.route("/usuarios/", methods=['POST'])
+def cadastrar(): 
     # adicionar user
     receber_user = request.json
     cadastrar = User(nome=receber_user['nome'], senha=receber_user['senha'], email=receber_user['email'])
@@ -47,20 +42,22 @@ def cadastrar(id):
 def update(id): 
     # verificar se existe
     verificar = User.query.get(id)
-    if verificar is None: 
-        return gera_response(404, '', {}, mensagem='Usuário não cadastrado')
-    
-    # ver qual campo será alterado
-    receber_resp = request.json
-    if 'nome' in receber_resp: 
-        User.nome = receber_resp['nome']
-    if 'senha' in receber_resp: 
-        User.senha = receber_resp['senha']
-    if 'email' in receber_resp: 
-        User.email = receber_resp['email']
-    db.session.commit()
-
-    return gera_response(204, '', {}, mensagem='Usuário atualizado.')
+    if verificar: 
+        # ver qual campo será alterado
+        receber_resp = request.json
+        if receber_resp:
+            if 'nome' in receber_resp: 
+                verificar.nome = receber_resp['nome']
+            if 'senha' in receber_resp: 
+                verificar.senha = receber_resp['senha']
+            if 'email' in receber_resp: 
+                verificar.email = receber_resp['email']
+            db.session.commit()
+            return gera_response(204, '', {}, mensagem='Usuário atualizado.')
+        else: 
+            return gera_response(400, '', {}, mensagem='Corpo da requisição vazio')
+    else: 
+        return gera_response(404, '', {}, mensagem='Usuario não encontrado!')
 
 # deletar
 @user_blueprint.route("/usuarios/<id>", methods=['DELETE'])

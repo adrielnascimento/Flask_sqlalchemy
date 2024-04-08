@@ -8,6 +8,7 @@
         "cadastrar",
         "cadastro",
         "configuração",
+        "Corpo",
         "criação",
         "deletado",
         "deletar",
@@ -17,6 +18,7 @@
         "gerador",
         "realizado",
         "receber",
+        "requisição",
         "selecionar",
         "senha",
         "será",
@@ -26,6 +28,7 @@
         "usuario",
         "Usuário",
         "usuarios",
+        "vazio",
         "verificar"
     ]
 }
