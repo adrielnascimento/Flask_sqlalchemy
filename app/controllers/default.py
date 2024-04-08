@@ -21,12 +21,26 @@ def selecionar_users():
     return gera_response(200, "usuarios", users_json)
 
 # selecionar um
-@user_blueprint.route("/usuario/<id>", methods=['GET'])
+@user_blueprint.route("/usuarios/<id>", methods=['GET'])
 def selecionar_user(id): 
     user = User.query.filter(id).first()
     user_json = user.to_json()
     return Response(200, "usuario", user_json)
 
 # cadastrar 
+@user_blueprint.route("/usuarios/<id>", methods=['POST'])
+def cadastrar(id): 
+    # verificar se user ja existe
+    verificar = User.query.get(id)
+    if verificar is None: 
+        return gera_response(404, "", {}, mensagem='Usuário não encontrado')
+    
+    # adicionar user
+    receber_user = request.json
+    cadastrar = User(nome=receber_user['nome'], senha=receber_user['senha'], email=receber_user['email'])
+    db.session.add(cadastrar)
+    db.session.commit()
+    return gera_response(204, "", {}, mensagem='cadastro realizado com sucesso!')
+
 # atualizar 
 # deletar
