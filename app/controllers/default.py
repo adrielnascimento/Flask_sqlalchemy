@@ -4,6 +4,7 @@ import json
 
 user_blueprint = Blueprint('user', __name__)
 
+
 # fazer um gerador de response
 def gera_response(status, nome_conteudo, conteudo, mensagem=False): 
     body = {}
@@ -16,12 +17,17 @@ def gera_response(status, nome_conteudo, conteudo, mensagem=False):
 # selecionar todos
 @user_blueprint.route("/usuarios", methods=['GET'])
 def selecionar_users(): 
-    if request.method == 'GET': 
-        users = User.query.all()
-        users_json = [c.to_json() for c in users]
-        return gera_response(200, "usuarios", users_json)
+    if request.method == 'GET':
+        page = request.args.get('page', 1, type=int)
+        per_page = request.args.get('per_page', 10, type=int) 
+        users = User.query.paginate(page=page, per_page=per_page)
+        users_json = [user.to_json() for user in users.items]
+        return gera_response(200, "usuarios", users_json, mensagem='Consulta bem-sucedida',
+                             total_items=users.total, total_pages=users.pages,
+                             current_page=users.page, per_page=per_page)
     else:
         return 'erro! metodo invalido'
+    
 # selecionar um
 @user_blueprint.route("/usuarios/<id>", methods=['GET'])
 def selecionar_user(id): 
