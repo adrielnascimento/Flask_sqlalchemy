@@ -13,6 +13,9 @@ def gera_response(status, nome_conteudo, conteudo, mensagem=False):
         body[mensagem] = mensagem
     return Response(json.dumps(body), status=status, mimetype='application/json')
 
+def erro(): 
+    pass
+
 # crud
 # selecionar todos
 @user_blueprint.route("/usuarios", methods=['GET'])
@@ -32,13 +35,20 @@ def selecionar_users():
 @user_blueprint.route("/usuarios/<id>", methods=['GET'])
 def selecionar_user(id): 
     user = User.query.filter_by(id=id).first()
+    if user is None: 
+        return gera_response(404, '', {}, mensagem='Usuário não existe')
+    
     user_json = user.to_json()
     return Response(200, "usuario", user_json)
 
 # cadastrar 
-@user_blueprint.route("/usuarios/", methods=['POST'])
+@user_blueprint.route("/usuarios", methods=['POST'])
 def cadastrar(): 
     if request.method == 'POST': 
+        require = ['nome', 'senha', 'email']
+        if not all(field in request.json for field in require): 
+            return gera_response(400, '', {}, mensagem='todos os campos são obrigatorios')
+        
         # adicionar user
         receber_user = request.json
         cadastrar = User(nome=receber_user['nome'], senha=receber_user['senha'], email=receber_user['email'])
