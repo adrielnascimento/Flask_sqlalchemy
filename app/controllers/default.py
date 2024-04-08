@@ -1,4 +1,4 @@
-from flask import Blueprint, Response, request
+from flask import Blueprint, Response, request, jsonify
 from models.table import User, db
 import json
 
@@ -14,7 +14,7 @@ def gera_response(status, nome_conteudo, conteudo, mensagem=False):
     return Response(json.dumps(body), status=status, mimetype='application/json')
 
 def erro(): 
-    pass
+    return jsonify({'error': 'Houve um erro na requisição, por favor use o método correto.'}), 400
 
 # crud
 # selecionar todos
@@ -29,7 +29,7 @@ def selecionar_users():
                              total_items=users.total, total_pages=users.pages,
                              current_page=users.page, per_page=per_page)
     else:
-        return 'erro! metodo invalido'
+        return erro()
     
 # selecionar um
 @user_blueprint.route("/usuarios/<id>", methods=['GET'])
@@ -56,7 +56,7 @@ def cadastrar():
         db.session.commit()
         return gera_response(204, "", {}, mensagem='cadastro realizado com sucesso!')
     else: 
-        return 'erro! metodo invalido'
+        return erro()
 
 # atualizar
 @user_blueprint.route("/usuarios/<id>", methods=['PUT'])
@@ -81,15 +81,18 @@ def update(id):
         else: 
             return gera_response(404, '', {}, mensagem='Usuario não encontrado!')
     else:
-        return 'erro! metodo invalido'
+        return erro()
 
 # deletar
 @user_blueprint.route("/usuarios/<id>", methods=['DELETE'])
-def deletar(id): 
-    user = User.query.get(id) 
-    if user is None: 
-        return gera_response(404, '', {}, mensagem='Usuário não encontrado!')
-    
-    db.session.delete(user)
-    db.session.commit()
-    return gera_response(200, '', {}, mensagem='usuário deletado!')
+def deletar(id):
+    if request.method == 'DELETE':  
+        user = User.query.get(id) 
+        if user is None: 
+            return gera_response(404, '', {}, mensagem='Usuário não encontrado!')
+        
+        db.session.delete(user)
+        db.session.commit()
+        return gera_response(200, '', {}, mensagem='usuário deletado!')
+    else:
+        return erro()
