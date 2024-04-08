@@ -1,8 +1,16 @@
 {
     "cSpell.words": [
+        "atualizar",
+        "cadastrar",
         "configuração",
         "criação",
+        "deletar",
+        "fazer",
+        "gerador",
+        "selecionar",
         "senha",
-        "SQLALCHEMY"
+        "SQLALCHEMY",
+        "todos",
+        "usuarios"
     ]
 }
