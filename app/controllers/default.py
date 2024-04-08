@@ -63,3 +63,12 @@ def update(id):
     return gera_response(204, '', {}, mensagem='Usuário atualizado.')
 
 # deletar
+@user_blueprint.route("/usuarios/<id>", methods=['DELETE'])
+def deletar(id): 
+    user = User.query.get(id) 
+    if user is None: 
+        return gera_response(404, '', {}, mensagem='Usuário não encontrado!')
+    
+    db.session.delete(user)
+    db.session.commit()
+    return gera_response(200, '', {}, mensagem='usuário deletado!')
