@@ -20,8 +20,13 @@ def selecionar_users():
     users_json = [c.to_json() for c in users]
     return gera_response(200, "usuarios", users_json)
 
-
 # selecionar um
+@user_blueprint.route("/usuario/<id>", methods=['GET'])
+def selecionar_user(id): 
+    user = User.query.filter(id).first()
+    user_json = user.to_json()
+    return Response(200, "usuario", user_json)
+
 # cadastrar 
 # atualizar 
 # deletar
