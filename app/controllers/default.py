@@ -42,5 +42,24 @@ def cadastrar(id):
     db.session.commit()
     return gera_response(204, "", {}, mensagem='cadastro realizado com sucesso!')
 
-# atualizar 
+# atualizar
+@user_blueprint.route("/usuarios/<id>", methods=['PUT'])
+def update(id): 
+    # verificar se existe
+    verificar = User.query.get(id)
+    if verificar is None: 
+        return gera_response(404, '', {}, mensagem='Usuário não cadastrado')
+    
+    # ver qual campo será alterado
+    receber_resp = request.json
+    if 'nome' in receber_resp: 
+        User.nome = receber_resp['nome']
+    if 'senha' in receber_resp: 
+        User.senha = receber_resp['senha']
+    if 'email' in receber_resp: 
+        User.email = receber_resp['email']
+    db.session.commit()
+
+    return gera_response(204, '', {}, mensagem='Usuário atualizado.')
+
 # deletar
