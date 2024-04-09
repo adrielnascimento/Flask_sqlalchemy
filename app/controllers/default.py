@@ -7,14 +7,20 @@ user_blueprint = Blueprint('user', __name__)
 
 # fazer um gerador de response
 def gera_response(status, nome_conteudo, conteudo, mensagem=False): 
+    response = {
+        "status": status,
+        "nome_conteudo": nome_conteudo,
+        "conteudo": conteudo,
+    }
+
     body = {}
     body[nome_conteudo] = conteudo
     if mensagem: 
         body[mensagem] = mensagem
     return Response(json.dumps(body), status=status, mimetype='application/json')
 
-def erro(): 
-    return jsonify({'error': 'Houve um erro na requisição, por favor use o método correto.'}), 400
+def erro(status=400): 
+    return jsonify({'error': f'Houve um erro na requisição, por favor use o método correto. {status}'})
 
 # crud
 # selecionar todos
@@ -25,11 +31,9 @@ def selecionar_users():
         per_page = request.args.get('per_page', 10, type=int) 
         users = User.query.paginate(page=page, per_page=per_page)
         users_json = [user.to_json() for user in users.items]
-        return gera_response(200, "usuarios", users_json, mensagem='Consulta bem-sucedida',
-                             total_items=users.total, total_pages=users.pages,
-                             current_page=users.page, per_page=per_page)
+        return gera_response(200, "usuarios", users_json, mensagem='Consulta bem-sucedida')
     else:
-        return erro()
+        return erro(400)
     
 # selecionar um
 @user_blueprint.route("/usuarios/<id>", methods=['GET'])
@@ -39,7 +43,7 @@ def selecionar_user(id):
         return gera_response(404, '', {}, mensagem='Usuário não existe')
     
     user_json = user.to_json()
-    return Response(200, "usuario", user_json)
+    return gera_response(200, "usuario", user_json)
 
 # cadastrar 
 @user_blueprint.route("/usuarios", methods=['POST'])
@@ -56,7 +60,7 @@ def cadastrar():
         db.session.commit()
         return gera_response(204, "", {}, mensagem='cadastro realizado com sucesso!')
     else: 
-        return erro()
+        return erro(400)
 
 # atualizar
 @user_blueprint.route("/usuarios/<id>", methods=['PUT'])
